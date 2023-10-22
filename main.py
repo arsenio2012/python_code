@@ -13,32 +13,37 @@ mycursor = mydb.cursor()
 
 # Función para agregar un producto al inventario
 def agregar_producto():
-    
-    
-    if entry_nombre.get() != "":
-        nombre = entry_nombre.get()
-    else:
+    nombre = entry_nombre.get()
+    cantidad = entry_cantidad.get()
+    precio = entry_precio.get()
+
+    if not nombre:
         messagebox.showerror("ERROR", "falta agregar NOMBRE")
+       
 
-    if entry_cantidad.get() != "":
-        cantidad = entry_cantidad.get()
+    if not cantidad:
+       messagebox.showerror("ERROR", "falta agregar CANTIDAD")
+ 
+    if not precio:
+        messagebox.showerror("ERROR", "falta agregar PRECIO")
+       
+    # Consultar si el producto ya existe
+    sql = "SELECT nombre FROM productos WHERE nombre = %s"
+    val = (nombre,)
+    mycursor.execute(sql, val)
+    existing_product = mycursor.fetchone()
+
+    if existing_product:
+        messagebox.showerror("ERROR", "El producto ya existe en la base de datos")
     else:
-        messagebox.showerror("ERROR", "falta agregar CANTIDAD")
-            
-    if entry_precio.get() != "":
-        precio = entry_precio.get()
-    else:
-     messagebox.showerror("ERROR", "falta agregar PRECIO")
+        if nombre and cantidad and precio:
+            sql= "INSERT INTO productos (nombre, precio, cantidad) VALUES (%s, %s, %s)"
+            val=(nombre, precio, cantidad)
+            mycursor.execute(sql, val)
+            mydb.commit()
 
-
-    if nombre and cantidad and precio:
-        sql= "INSERT INTO productos (nombre, precio, cantidad) VALUES (%s, %s, %s)"
-        val=(nombre, precio, cantidad)
-        mycursor.execute(sql, val)
-        mydb.commit()
-
-        messagebox.showinfo("exito","producto agregado correctamente")
-        obtener_productos()
+            messagebox.showinfo("exito","producto agregado correctamente")
+            obtener_productos()
     
 
 # Función para buscar un producto en el inventario
